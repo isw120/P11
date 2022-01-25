@@ -21,6 +21,21 @@ def checkEmail(email):
     except IndexError:
         raise IndexError()
 
+def checkAvailablePoints(competitionParam, clubParam, placesParam):
+    competition = [c for c in competitions if c['name'] == competitionParam][0]
+    club = [c for c in clubs if c['name'] == clubParam][0]
+    placesRequired = int(placesParam)
+    if placesRequired <= int(club['points']):
+        competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+        club['points'] = int(club['points']) - placesRequired
+        check = False
+        return check, club, competition
+    else:
+        check = True
+        return check, clubParam, competitionParam
+
+
+
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
@@ -42,9 +57,11 @@ def showSummary():
 
 
 @app.route('/book/<competition>/<club>')
-def book(competition,club):
+def book(competition,club, error=None):
     foundClub = [c for c in clubs if c['name'] == club][0]
     foundCompetition = [c for c in competitions if c['name'] == competition][0]
+    if error is not None:
+        return render_template('booking.html',club=foundClub,competition=foundCompetition, error=error)
     if foundClub and foundCompetition:
         return render_template('booking.html',club=foundClub,competition=foundCompetition)
     else:
@@ -54,12 +71,12 @@ def book(competition,club):
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
-    placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    check, club, competition = checkAvailablePoints(request.form['competition'], request.form['club'], request.form['places'])
+    if check is False:
+        flash('Great-booking complete!')
+        return render_template('welcome.html', club=club, competitions=competitions)
+    else:
+        return book(competition, club, "You dont have enough points")
 
 
 # TODO: Add route for points display

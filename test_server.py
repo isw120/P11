@@ -23,5 +23,10 @@ class TestApp(unittest.TestCase):
         check, club, competition = checkAvailablePoints("Spring Festival", "Simply Lift", 30)
         assert check == True
 
+    def test_places_correctly_deducted_from_competition(self):
+        check, club, competition = checkAvailablePoints("Spring Festival", "Simply Lift", 5)
+        assert check == False
+        assert competition['numberOfPlaces'] == 20
+
 if __name__ == '__main__':
     unittest.main()

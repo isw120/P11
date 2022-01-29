@@ -1,5 +1,6 @@
 import json
 from flask import Flask,render_template,request,redirect,flash,url_for
+from datetime import datetime, timedelta
 
 
 def loadClubs():
@@ -34,7 +35,17 @@ def checkAvailablePoints(competitionParam, clubParam, placesParam):
         check = True
         return check, clubParam, competitionParam
 
-
+def checkCompetitionsDates():
+    all_competitions = []
+    today = datetime.now()
+    for c in competitions:
+        competition_date = datetime.strptime(c['date'], '%Y-%m-%d %H:%M:%S')
+        if today < competition_date:
+            c['status'] = 'valid'
+        else:
+            c['status'] = 'invalid'
+        all_competitions.append(c)
+    return all_competitions
 
 
 app = Flask(__name__)
@@ -51,7 +62,8 @@ def index():
 def showSummary():
         try:
             club = checkEmail(request.form['email'])
-            return render_template('welcome.html', club=club, competitions=competitions)
+            all_competitions = checkCompetitionsDates()
+            return render_template('welcome.html', club=club, competitions=all_competitions)
         except IndexError:
             return render_template('index.html', error="Sorry, that email wasn't found.")
 
@@ -60,13 +72,20 @@ def showSummary():
 def book(competition,club, error=None):
     foundClub = [c for c in clubs if c['name'] == club][0]
     foundCompetition = [c for c in competitions if c['name'] == competition][0]
+    print(foundCompetition)
     if error is not None:
         return render_template('booking.html',club=foundClub,competition=foundCompetition, error=error)
+    if foundCompetition['status'] == 'invalid':
+        flash("The competition " + str(foundCompetition['name']) + " is invalid.")
+        return render_template('welcome.html', club=foundClub, competitions=competitions)
+    if foundCompetition['numberOfPlaces'] == 0:
+        flash("The competition " + str(foundCompetition['name']) + " is completed.")
+        return render_template('welcome.html', club=foundClub, competitions=competitions)
     if foundClub and foundCompetition:
-        return render_template('booking.html',club=foundClub,competition=foundCompetition)
+        return render_template('booking.html', club=foundClub, competition=foundCompetition)
     else:
         flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=foundClub, competitions=competitions)
 
 
 @app.route('/purchasePlaces',methods=['POST'])

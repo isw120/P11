@@ -2,7 +2,7 @@ import unittest
 
 import pytest
 
-from server import checkEmail, checkAvailablePoints
+from server import checkEmail, checkAvailablePoints, checkCompetitionsDates
 
 
 class TestApp(unittest.TestCase):
@@ -27,6 +27,13 @@ class TestApp(unittest.TestCase):
         check, club, competition = checkAvailablePoints("Spring Festival", "Simply Lift", 5)
         assert check == False
         assert competition['numberOfPlaces'] == 20
+
+    def test_competitions_dates(self):
+        all_competitions = checkCompetitionsDates()
+        competition_01 = all_competitions[0]
+        competition_02 = all_competitions[2]
+        assert competition_01['status'] == 'invalid'
+        assert competition_02['status'] == 'valid'
 
 if __name__ == '__main__':
     unittest.main()

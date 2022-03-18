@@ -16,7 +16,7 @@ class TestApp(unittest.TestCase):
         assert club['name'] == 'Simply Lift'
 
     def test_purchase_places_success(self):
-        check, club, competition = checkAvailablePoints("Spring Festival", "Simply Lift", 5)
+        check, club, competition = checkAvailablePoints("Spring Festival", "Simply Lift", 2)
         assert check == False
 
     def test_purchase_places_failure(self):
@@ -24,9 +24,9 @@ class TestApp(unittest.TestCase):
         assert check == True
 
     def test_places_correctly_deducted_from_competition(self):
-        check, club, competition = checkAvailablePoints("Spring Festival", "Simply Lift", 5)
+        check, club, competition = checkAvailablePoints("Spring Festival", "Simply Lift", 2)
         assert check == False
-        assert competition['numberOfPlaces'] == 20
+        assert competition['numberOfPlaces'] == 23
 
     def test_competitions_dates(self):
         all_competitions = checkCompetitionsDates()

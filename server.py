@@ -26,9 +26,9 @@ def checkAvailablePoints(competitionParam, clubParam, placesParam):
     competition = [c for c in competitions if c['name'] == competitionParam][0]
     club = [c for c in clubs if c['name'] == clubParam][0]
     placesRequired = int(placesParam)
-    if placesRequired <= int(club['points']):
+    if (placesRequired * 3) <= int(club['points']):
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
-        club['points'] = int(club['points']) - placesRequired
+        club['points'] = int(club['points']) - (placesRequired * 3)
         check = False
         return check, club, competition
     else:

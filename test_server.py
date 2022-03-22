@@ -1,9 +1,8 @@
 import unittest
 
-import pytest
+import pytest, requests
 
 from server import checkEmail, checkAvailablePoints, checkCompetitionsDates
-
 
 class TestApp(unittest.TestCase):
 
@@ -34,6 +33,22 @@ class TestApp(unittest.TestCase):
         competition_02 = all_competitions[2]
         assert competition_01['status'] == 'invalid'
         assert competition_02['status'] == 'valid'
+
+    def test_index_url(self):
+        assert 200 == requests.get('http://127.0.0.1:5000').status_code
+
+    def test_showSummary_url(self):
+        assert 200 == requests.post("http://localhost:5000/showSummary", {"email": "john@simplylift.co"}).status_code
+
+    def test_book_url(self):
+        assert 200 == requests.get("http://localhost:5000/book/Spring%20Festival/Simply%20Lift").status_code
+
+    def test_purchasePlaces_url(self):
+        assert 200 == requests.post("http://localhost:5000/purchasePlaces", {"club": "Simply Lift", "competition": "Spring Festival", "places": "3"}).status_code
+
+    def test_logout_url(self):
+        assert 200 == requests.get("http://localhost:5000/logout").status_code
+
 
 if __name__ == '__main__':
     unittest.main()

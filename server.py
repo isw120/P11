@@ -91,6 +91,8 @@ def book(competition,club, error=None):
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
+    if int(request.form['places']) > 12:
+        return book(request.form['competition'], request.form['club'], "You cant book more than 12 places")
     check, club, competition = checkAvailablePoints(request.form['competition'], request.form['club'], request.form['places'])
     other_clubs = [c for c in clubs if c['name'] != request.form['club']]
     if check is False:
